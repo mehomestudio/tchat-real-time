@@ -1,0 +1,13 @@
+@use 'mixin' as *;
+
+.app-content {
+  background-color: var(--body-background);
+  padding: 20px;
+}
+
+.content {
+  &-main {
+    max-width: var(--max-width);
+    padding: 50px 0;
+  }
+}

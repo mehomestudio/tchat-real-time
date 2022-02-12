@@ -1,0 +1,30 @@
+@use '../mixin' as *;
+
+.btn {
+  border-radius: var(--border-radius);
+  padding: 10px 20px;
+  cursor: pointer;
+  border: 0;
+  box-shadow: var(--box-shadow);
+  font-family: var(--font-adamina);
+  &-primary {
+    background-color: var(--primary);
+    color: var(--light);
+    font-weight: 600;
+  }
+  &-secondary {
+    background-color: var(--secondary);
+    color: var(--light);
+    font-weight: 600;
+  }
+  &-small {
+    padding: 5px 15px;
+  }
+  &:hover {
+    opacity: 0.8;
+    transition: opacity 0.4s;
+  }
+  @include xs {
+    display: none;
+  }
+}
