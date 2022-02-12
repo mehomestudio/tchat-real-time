@@ -1,0 +1,6 @@
+FROM node:lts
+WORKDIR /app
+COPY ./ws/package.json .
+RUN yarn
+COPY ./ws .
+CMD ["yarn", "start"]

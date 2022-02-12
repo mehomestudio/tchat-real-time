@@ -5,7 +5,7 @@ services:
     network_mode: 'host'
     container_name: 'tchat_real_time_mysql'
     image: mysql:8.0
-    command: --default-authentication-plugin=mysql_native_password
+    command: --default-authentication-plugin=mysql_native_password --port=8001
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: password
@@ -32,9 +32,9 @@ services:
     depends_on:
       - mysql
 
-  node:
+  node-encore:
     network_mode: 'host'
-    container_name: 'tchat_real_time_node'
+    container_name: 'tchat_real_time_node_encore'
     build:
       context: .
       dockerfile: ./docker/Dockerfile.encore.dev
@@ -46,6 +46,19 @@ services:
         target: /app/node_modules
       - type: bind
         source: ./app
+        target: /app
+
+  node-ws:
+    network_mode: 'host'
+    container_name: 'tchat_real_time_node_ws'
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.nodews.dev
+    volumes:
+      - type: volume
+        target: /ws/node_modules
+      - type: bind
+        source: ./ws
         target: /app
 
 volumes:
