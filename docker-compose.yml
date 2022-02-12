@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mysql:
+    network_mode: 'host'
+    container_name: 'tchat_real_time_mysql'
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+    volumes:
+      - type: volume
+        source: tchat-real-time-db
+        target: /var/lib/mysql
+
+  php:
+    network_mode: 'host'
+    container_name: 'tchat_real_time_php'
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.php
+    volumes:
+      - type: volume
+        source: tls
+        target: /root/.symfony/certs
+      - type: bind
+        source: ./app
+        target: /app
+      - type: volume
+        target: /app/vendor
+    depends_on:
+      - mysql
+
+  node:
+    network_mode: 'host'
+    container_name: 'tchat_real_time_node'
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile.encore.dev
+    volumes:
+      - type: volume
+        source: tls
+        target: /root/.symfony/certs
+      - type: volume
+        target: /app/node_modules
+      - type: bind
+        source: ./app
+        target: /app
+
+volumes:
+  tchat-real-time-db:
+    external: true
+  tls:
