@@ -1,0 +1,30 @@
+:root {
+  --primary: #05204A;
+  --primary-light: rgba(5, 32, 74, .15);
+  --secondary: #F24E1E;
+  --secondary-ligth: rgba(242, 78, 30 , 0.15);
+  --light: #FFFAE3;
+  --warning: rgba(141, 8, 11, 0.85);
+  --success: rgba(10, 108, 43, 0.85);
+  --font-lato: 'Lato', 'sans-serif';
+  --font-adamina: 'Adamina', 'serif';
+  --font-weight-regular: 400;
+  --font-weight-semi-bold: 700;
+  --font-weight-bold: 900;
+  --font-size-small: 14px;
+  --font-size-regular: 16px;
+  --font-size-large: 22px;
+  --box-shadow: 0 1px 2px 0 rgb(60 64 67 / 30%), 0 1px 3px 1px rgb(60 64 67 / 15%);
+  --border-radius: 3px;
+  --border: 1px solid var(--gray-light);
+  --color: #636466;
+  --color-dark: #444;
+  --gray: #636466;
+  --gray-light: #ddd;
+  --gray-dark: #444;
+  --gray-dark-transparent: rgba(68, 68, 68, 0.4);
+  --max-width: 1200px;
+  --body-background: var(--light);
+  --footer-background: #05204A;
+  --line-height-hight: 30px;
+}

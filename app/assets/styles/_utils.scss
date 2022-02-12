@@ -1,0 +1,170 @@
+@use 'mixin' as *;
+.d-none {
+  display: none;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.flex-row-nowrap {
+  flex-flow: row nowrap;
+}
+
+.flex-row-wrap {
+  flex-flow: row wrap;
+}
+
+.flex-column {
+  flex-direction: column;
+  &-xs {
+    @include xs {
+      flex-direction: column;
+    }
+  }
+}
+
+.flex-fill {
+  flex: 1;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.align-items-top {
+  align-items: flex-start;
+}
+
+.align-items-end {
+  align-items: flex-end;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.justify-content-end {
+  justify-content: flex-end;
+}
+
+/* margin */
+.ms-auto {
+  margin-left: auto;
+}
+
+.me-auto {
+  margin-right: auto;
+}
+
+.m-5 {
+  margin: 5px;
+}
+
+.me-5 {
+  margin-right: 5px;
+}
+
+.m-10 {
+  margin: 10px;
+}
+
+.me-10 {
+  margin-right: 10px;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.m-20 {
+  margin: 20px;
+}
+
+.me-20 {
+  margin-right: 20px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.me-50 {
+  margin-right: 50px;
+}
+
+/* padding */
+.p-5 {
+  padding: 5px;
+}
+
+.p-10 {
+  padding: 10px;
+}
+
+.p-20 {
+  padding: 20px;
+}
+
+.p-30 {
+  padding: 30px;
+}
+
+.pb-10 {
+  padding-bottom: 10px;
+}
+
+.pb-20 {
+  padding-bottom: 20px;
+}
+
+.pb-30 {
+  padding-bottom: 30px;
+}
+
+.ps-20 {
+  padding-left: 20px;
+}
+
+.pe-20 {
+  padding-right: 20px;
+}
+
+.py-20 {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.py-50 {
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.box-shadow {
+  box-shadow: var(--box-shadow);
+}
+
+.hide-xs {
+  @include xs {
+    display: none;
+  }
+}
+
+.show-xs {
+  display: none;
+  @include xs {
+    display: inherit;
+  }
+}
+
+.hidden {
+  display: none;
+}

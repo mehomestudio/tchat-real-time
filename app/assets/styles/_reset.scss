@@ -1,0 +1,25 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--primary);
+  background-color: var(--body-background);
+  font-family: var(--font-lato);
+}
+
+ul {
+  list-style: none;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--secondary);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
