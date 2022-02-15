@@ -2,6 +2,12 @@
 
 {% block title %}Chat Test{% endblock %}
 
-{% block body %}
+{% block javascripts %}
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}
 
+{% block body %}
+    <div class="d-flex flex-row-nowrap flex-fill">
+        <button id="test">Test</button>
+    </div>
 {% endblock %}

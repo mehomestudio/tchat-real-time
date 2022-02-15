@@ -31,6 +31,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', unique: true, nullable: true)]
     private ?string $token = null;
 
+    #[ORM\Column(type: 'boolean')]
+    private bool $isEmailVerified = false;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $tokenEmail = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $forgottenPasswordToken = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -72,7 +81,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -130,5 +138,41 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getIsEmailVerified(): ?bool
+    {
+        return $this->isEmailVerified;
+    }
+
+    public function setIsEmailVerified(bool $isEmailVerified): self
+    {
+        $this->isEmailVerified = $isEmailVerified;
+
+        return $this;
+    }
+
+    public function getTokenEmail(): ?string
+    {
+        return $this->tokenEmail;
+    }
+
+    public function setTokenEmail(?string $tokenEmail): self
+    {
+        $this->tokenEmail = $tokenEmail;
+
+        return $this;
+    }
+
+    public function getForgottenPasswordToken(): ?string
+    {
+        return $this->forgottenPasswordToken;
+    }
+
+    public function setForgottenPasswordToken(?string $forgottenPasswordToken): self
+    {
+        $this->forgottenPasswordToken = $forgottenPasswordToken;
+
+        return $this;
     }
 }
