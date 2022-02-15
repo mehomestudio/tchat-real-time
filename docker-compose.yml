@@ -23,7 +23,7 @@ services:
     volumes:
       - type: volume
         source: tls
-        target: /root/.symfony/certs
+        target: /root/.symfony5/certs
       - type: bind
         source: ./app
         target: /app
@@ -41,7 +41,7 @@ services:
     volumes:
       - type: volume
         source: tls
-        target: /root/.symfony/certs
+        target: /root/.symfony5/certs
       - type: volume
         target: /app/node_modules
       - type: bind
@@ -56,10 +56,17 @@ services:
       dockerfile: ./docker/Dockerfile.nodews.dev
     volumes:
       - type: volume
+        source: tls
+        target: /root/.symfony5/certs
+      - type: volume
         target: /ws/node_modules
       - type: bind
         source: ./ws
         target: /app
+    depends_on:
+      - mysql
+      - php
+      - node-encore
 
 volumes:
   tchat-real-time-db:

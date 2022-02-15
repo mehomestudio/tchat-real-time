@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "license": "MIT",
   "dependencies": {
-    "fastify": "^3.27.1",
-    "fastify-websocket": "^4.0.0"
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.15",
+    "socket.io": "^4.4.1"
   },
   "scripts": {
-    "start": "node src/server/server.js"
+    "start": "nodemon src/server/server.js"
   }
 }

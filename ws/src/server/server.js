@@ -1,35 +1,40 @@
-const fastify = require('fastify')({ logger: false });
+const PORT = process.env.PORT || 8003;
 
-fastify.register(require('fastify-websocket'), {
-    options: {
-        maxPayload: 1048576,
-        clientTracking: true,
-    },
+const { Server } = require("socket.io");
+const mysql = require('mysql');
+
+const db = mysql.createConnection({
+    host: "localhost",
+    port: 8001,
+    user: "root",
+    password: "password",
+    database: "db_dev"
 });
 
-fastify.get('/', { websocket: true }, (connection, req) => {
-    connection.socket.on('message', (data) => {
-        try {
-            fastify.websocketServer.clients.forEach((client) => {
-                if (client.readyState === 1) {
-                    client.send('Connecté au serveur');
-                }
-            })
-        } catch (error) {
-            console.error(error);
-        }
+db.connect((err) => {
+    if (err) throw err;
+    console.log("Connecté à la base de données MySQL!");
+})
+
+const io = new Server(parseInt(PORT), {
+    cors: {
+        origin: "https://localhost:8000",
+        methods: ["GET", "POST"]
+    }
+});
+
+let onlines = [];
+
+io.on("connect", (socket) => {
+    socket.on("load", (token) => {
+        db.query(`SELECT pseudo, token FROM user WHERE token = ${db.escape(token)}`, (err, result, fields) => {
+            onlines.push(result[0]);
+        });
+    });
+
+    socket.on("disconnect", (t) => {
+        const index = onlines.indexOf(socket.id);
+        onlines = onlines.filter((online) => online !== socket.id);
+        socket.disconnect(true);
     });
 });
-
-const start = async() => {
-    try {
-        const PORT = process.env.PORT || 8003;
-        await fastify.listen(PORT);
-        console.log('Connecting in port '+PORT);
-    } catch (err) {
-        fastify.log.error(err);
-        process.exit(1);
-    }
-}
-
-start();
