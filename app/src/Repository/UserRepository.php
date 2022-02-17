@@ -36,6 +36,17 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->flush();
     }
 
+    public function findByEmailOrPseudo(string $value): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.email = :val')
+            ->orWhere('u.pseudo = :val')
+            ->setParameter('val', $value)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
     // /**
     //  * @return User[] Returns an array of User objects
     //  */

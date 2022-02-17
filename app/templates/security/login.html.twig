@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Log in!{% endblock %}
+{% block title %}Se connecter{% endblock %}
 
 {% block body %}
     <div class="d-flex flex-column align-items-center justify-content-center w-100">
@@ -29,7 +29,7 @@
                 </button>
             </div>
             <div class="d-flex flex-row-nowrap justify-content-between">
-                <a href="#">Mot de passe perdu ?</a>
+                <a href="{{ path('app_forgotten_password_request') }}">Mot de passe perdu ?</a>
                 <a href="{{ path('app_register') }}">Pas encore de compte ?</a>
             </div>
         </form>

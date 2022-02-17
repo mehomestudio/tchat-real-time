@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\ForgottenPasswordRequestType;
 use App\Form\RegistrationType;
 use App\Function\TokenFunc;
 use App\Repository\UserRepository;
@@ -141,6 +142,134 @@ class SecurityController extends AbstractController
         $this->addFlash('notice', $notice);
 
         return $this->redirectToRoute('app_login');
+    }
+
+    #[Route('/mot-de-passe-perdu', name: 'app_forgotten_password_request')]
+    public function forgottenPasswordRequest(
+        Request $request,
+        ManagerRegistry $manager,
+        UserRepository $repo,
+        MailerInterface $mailer
+    ): Response
+    {
+
+        $form = $this->createForm(ForgottenPasswordRequestType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid())
+        {
+            $identifiant = $form->get('identifiant')->getData();
+            $user = $repo->findByEmailOrPseudo($identifiant);
+
+            if ($user) {
+                $token = TokenFunc::generateToken();
+                $user->setForgottenPasswordToken(sha1($token));
+
+                $manager->getManager()->persist($user);
+                $manager->getManager()->flush();
+
+                $email = (new TemplatedEmail())
+                    ->to($user->getEmail())
+                    ->subject('Mot de passe perdu')
+                    ->htmlTemplate('emails/templates/forgotten-password.html.twig')
+                    ->context([
+                        'pseudo' => $user->getPseudo(),
+                        'token' => $token
+                    ]);
+
+                try {
+                    $mailer->send($email);
+                } catch (TransportExceptionInterface $e) {
+                }
+            }
+
+            $this->addFlash(
+                'notice',
+                'Demande de réinitialisation de mot de passe réalisée avec succès, un email vous a été envoyé.'
+            );
+
+            return $this->redirectToRoute('app_login');
+
+        }
+
+        return $this->render('security/forgotten-password-request.html.twig', [
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/mot-de-passe-perdu/{pseudo}/{token}', name: 'app_forgotten_password_reset')]
+    #[Entity('user', options: ['mapping' => ['pseudo' => 'pseudo']])]
+    public function forgottenPasswordReset(
+        ?User $user,
+        string $token,
+        Request $request,
+        ManagerRegistry $manager,
+        MailerInterface $mailer,
+        UserPasswordHasherInterface $hasher
+    ): Response
+    {
+        if (!$user || $user->getForgottenPasswordToken() !== sha1($token)) {
+            if ($user) {
+                $token = TokenFunc::generateToken();
+                $user->setForgottenPasswordToken(sha1($token));
+                $manager->getManager()->persist($user);
+                $manager->getManager()->flush();
+
+                $email = (new TemplatedEmail())
+                    ->to($user->getEmail())
+                    ->subject('Mot de passe perdu')
+                    ->htmlTemplate('emails/templates/forgotten-password.html.twig')
+                    ->context([
+                        'pseudo' => $user->getPseudo(),
+                        'token' => $token
+                    ]);
+
+                try {
+                    $mailer->send($email);
+                } catch (TransportExceptionInterface $e) {
+                }
+            }
+
+            $this->addFlash(
+                'notice',
+                'Token invalide ou expiré, un email contenant une nouveau lien vous a été envoyé.'
+            );
+            return $this->redirectToRoute('app_login');
+        }
+
+        $form = $this->createForm(RegistrationType::class, $user);
+        $form->remove('email');
+        $form->remove('pseudo');
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setPassword($hasher->hashPassword($user, $user->getPassword()))
+                ->setForgottenPasswordToken(null);
+            $manager->getManager()->persist($user);
+            $manager->getManager()->flush();
+
+            $email = (new TemplatedEmail())
+                ->to($user->getEmail())
+                ->subject('Votre mot de passe a été modifié avec succès')
+                ->htmlTemplate('emails/templates/forgotten-password-success.html.twig')
+                ->context([
+                    'pseudo' => $user->getPseudo()
+                ]);
+
+            try {
+                $mailer->send($email);
+            } catch (TransportExceptionInterface $e) {
+            }
+
+            $this->addFlash('notice', 'Mot de passe modifié avec succès.');
+
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->render('security/forgotten-password-reset.html.twig', [
+            'form' => $form->createView(),
+            'email' => $user->getEmail()
+        ]);
     }
 
     /**
