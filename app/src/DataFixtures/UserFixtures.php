@@ -20,7 +20,8 @@ class UserFixtures extends Fixture
         for ($i=1; $i<=30; $i++) {
             $user = (new User())
                 ->setEmail("user$i@gmail.fr")
-                ->setPseudo("User$i");
+                ->setPseudo("User$i")
+                ->setIsEmailVerified(true);
 
             $user->setPassword(
                 $this->hasher->hashPassword(
