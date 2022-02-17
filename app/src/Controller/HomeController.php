@@ -14,6 +14,9 @@ class HomeController extends AbstractController
     #[isGranted('IS_AUTHENTICATED_FULLY')]
     public function index(): Response
     {
+        /** @var User $user */
+        $user = $this->getUser();
+
         return $this->render('home/index.html.twig', [
         ]);
     }

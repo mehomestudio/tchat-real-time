@@ -4,11 +4,14 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
+#[UniqueEntity('email', message: 'L\'email existe déjà.')]
+#[UniqueEntity('pseudo', message: 'Le pseudo existe déjà.')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -17,15 +20,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private int $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Assert\NotBlank(message: 'Ce champ est obligatoire.')]
+    #[Assert\Email(message: 'Format de l\'email est invalide.')]
     private string $email;
 
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
     #[ORM\Column(type: 'string')]
+    #[Assert\NotBlank(message: 'Ce champ est obligatoire.')]
     private string $password;
 
     #[ORM\Column(type: 'string', unique: true)]
+    #[Assert\NotBlank(message: 'Ce champ est obligatoire.')]
     private string $pseudo;
 
     #[ORM\Column(type: 'string', unique: true, nullable: true)]

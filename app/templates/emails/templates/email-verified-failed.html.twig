@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+</head>
+<body>
+    <p>Hello {{ pseudo }}</p>
+    <p>Votre tentative de validation de votre email a échoué !</p>
+    <p>Pour renouveler la validation de votre email, cliquer sur le lien ci-dessous</p>
+    <a href="{{ url('app_email_verified', { 'pseudo': pseudo, 'token': token }) }}">Valider mon adresse email</a>
+</body>
+</html>
