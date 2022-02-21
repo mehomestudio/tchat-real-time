@@ -1,0 +1,53 @@
+.loading {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
+  background-color: var(--body-background);
+  border-radius: var(--border-radius);
+  z-index: 100;
+  height: 100vh;
+  width: 100vw;
+
+  &-circleborder {
+    border-radius: 50%;
+    width: 2em;
+    height: 2em;
+    border: 8px solid var(--light);
+    animation: border-circle 1.5s infinite linear;
+  }
+
+  &-text {
+    text-align: center;
+    line-height: 1.5em;
+    padding: 5px;
+    margin-top: 5px;
+    font-size: var(--font-size-small);
+    font-style: italic;
+  }
+}
+
+@keyframes border-circle {
+  0% {
+    border-color: var(--gray-dark);
+    border-top-color: var(--light);
+  }
+  25% {
+    border-color: var(--gray-dark);
+    border-right-color: var(--light);
+  }
+  50% {
+    border-color: var(--gray-dark);
+    border-bottom-color: var(--light);
+  }
+  75% {
+    border-color: var(--gray-dark);
+    border-left-color: var(--light);
+  }
+  100% {
+    border-color: var(--gray-dark);
+    border-top-color: var(--light);
+  }
+}

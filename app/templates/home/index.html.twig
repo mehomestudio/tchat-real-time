@@ -7,4 +7,42 @@
 {% endblock %}
 
 {% block body %}
+    <div class="chat d-none">
+        <div class="chat-rooms scrollbar-light"></div>
+        <div class="chat-messages-list">
+            <div class="chat-messages-list-header scrollbar-dark">
+                {#{% for k in 0..100 %}
+                <div class="chat-messages">
+                    <div class="chat-messages-header">
+                        <span class="chat-messages-pseudo">User1</span>
+                        <span class="chat-messages-date">20/02/2022</span>
+                        <span class="chat-messages-heure">17:01</span>
+                    </div>
+                    <div class="chat-messages-body">
+                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci amet at corporis dignissimos
+                        earum, eius esse est ex fugit hic modi odit pariatur possimus, quis quo tempore veniam
+                        vero voluptatibus.
+                    </div>
+                </div>
+                {% endfor %}#}
+            </div>
+            <div class="chat-messages-list-footer">
+                <div class="chat-messages-send">
+                    <input class="form-control" type="text" name="message" placeholder="Envoyer un message dans #Général" />
+                </div>
+            </div>
+        </div>
+        <div class="chat-users-list scrollbar-light">
+            <div class="chat-users-title">
+                En ligne - <span class="chat-users-count">0</span>
+            </div>
+            <div class="chat-users">
+ {#               {% for k in 1..31 %}
+                <div class="chat-users-body">
+                    User{{ k }}
+                </div>
+                {% endfor %}#}
+            </div>
+        </div>
+    </div>
 {% endblock %}
