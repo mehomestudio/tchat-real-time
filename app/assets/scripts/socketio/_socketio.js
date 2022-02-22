@@ -16,7 +16,7 @@ setTimeout(() => {
             window.location = '/se-deconnecter';
         }
     });
-}, 3000);
+}, 1000);
 
 export default {socket};
 

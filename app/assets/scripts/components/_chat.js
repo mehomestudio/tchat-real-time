@@ -1,4 +1,5 @@
 import {User} from "../entity/user";
+import {Message} from "../entity/message";
 
 /**
  * Gestion du chat
@@ -98,7 +99,7 @@ export class Chat {
             const heure = document.createElement('span');
 
             pseudo.className = "chat-messages-pseudo";
-            pseudo.innerHTML = this._escapeHtml(message.getAuthor());
+            pseudo.innerHTML = message.getAuthor();
             date.className = "chat-messages-date";
             date.innerHTML = message.getCreatedAt().toLocaleDateString('fr');
             heure.className = "chat-messages-heure";
@@ -107,7 +108,7 @@ export class Chat {
             header.append(pseudo, date, heure);
 
             body.className = "chat-messages-body";
-            body.innerHTML = this._escapeHtml(message.getContent());
+            body.innerHTML = message.getContent();
 
             messageElement.className = "chat-messages";
             messageElement.append(header, body);
@@ -136,8 +137,6 @@ export class Chat {
                 roomsDOM.append(roomDOM);
             });
             this._DOMElement.columns.rooms.append(roomsDOM);
-
-            console.log("1. ==> "+this._DOMElement.columns.messages.scrollHeight);
 
             this._datas.messages.forEach((message) => {
                 const messageDOM = this._createMessageDOM(message);
@@ -176,26 +175,58 @@ export class Chat {
             listRooms: listRooms
         };
 
-        this._DOMElement.inputSendMessage.addEventListener('keyup', (e) => {
-            if (e.key === "Enter" && e.currentTarget.value !== "")
-            {
-                this.addMessage(e.currentTarget.value, () => {
-                    e.currentTarget.value = "";
-                });
-            }
-        });
-
         this._loadDOM();
 
     }
 
     /**
+     * Vérification des caractères et les échappe si nécessaire (&<>"')
+     * @param value
+     * @returns {*}
+     */
+    htmlspecialchars(value) {
+        return this._escapeHtml(value);
+    }
+
+    updateScrollMessages() {
+        this._updateScroll(this._DOMElement.columns.messages);
+    }
+
+    /**
+     *
+     * @returns {Element}
+     */
+    getInputSend() {
+        return this._DOMElement.inputSendMessage;
+    }
+
+    /**
      *
      * @param value
-     * @param {function} cb
+     * @return Message
      */
-    addMessage(value, cb)
+    sendMessage(value)
     {
+        return new Message()
+            .setAuthor(this._datas.currentUser.getPseudo())
+            .setContent(this._escapeHtml(value))
+            .setCreatedAt(new Date());
+    }
+
+    /**
+     *
+     * @param {Message} msg
+     */
+    addMessage(msg)
+    {
+        const elementDOM = this._createMessageDOM(msg);
+        this._DOMElement.columns.messages.append(elementDOM);
+        this._datas.messages.push(msg);
+        this._updateScroll(this._DOMElement.columns.messages);
+    }
+
+    getMessages() {
+        return this._datas.messages;
     }
 
     addUser(userWs, cb)

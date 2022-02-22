@@ -3,6 +3,7 @@ import {User} from "../../entity/user";
 import {Notify} from "../../components/_notify";
 import {Chat} from "../../components/_chat";
 import {Message} from "../../entity/message";
+const {sendMessage} = require("./dom/input.listeners");
 
 let chat = null;
 
@@ -12,9 +13,9 @@ export function loadListenersGlobals(socket) {
         if (l.status === "success") {
             const loadingPage = new LoadingPage(document.querySelector("body"));
             const appPage = document.querySelector('.chat');
-            loadingPage.show();
             appPage.classList.remove('d-none');
             appPage.classList.add('d-flex');
+            loadingPage.show();
 
             loadingPage.updateMsg("Connexion au serveur...");
             const currentUser = (new User())
@@ -46,7 +47,12 @@ export function loadListenersGlobals(socket) {
             });
 
             chat = new Chat(currentUser, messages, onlineUsers, rooms);
+
+            chat.getInputSend().addEventListener("keyup", (e) => {
+                sendMessage(socket, chat, e);
+            });
             _load();
+
             loadingPage.updateMsg("Vous êtes connecté !<br/>Bienvenue "+currentUser.getPseudo());
 
             setTimeout(() => loadingPage.hide(), 200);
@@ -83,6 +89,15 @@ export function loadListenersGlobals(socket) {
                     }
                 );
             });
+        });
+
+        socket.on('add-message', (msg) => {
+            const message = new Message()
+                .setAuthor(msg['_author'])
+                .setContent(msg['_content'])
+                .setCreatedAt(new Date(msg['_createdAt']));
+
+            chat.addMessage(message);
         });
 
         socket.on('disconnect', () => {
