@@ -1,8 +1,15 @@
-const {getAllMessages} = require("../queries/message.queries");
+const {getAllMessages, saveNewMessages} = require("../queries/message.queries");
 
 class Datas {
 
     constructor() {
+        /**
+         *
+         * @type {number}
+         * @private
+         */
+        this._TIME_SAVE = 1000*15;
+
         /**
          *
          * @type {null|[]}
@@ -17,6 +24,34 @@ class Datas {
          */
         this._messages = [];
 
+        /**
+         *
+         * @type {null|[]}
+         * @private
+         */
+        this._newMessages = [];
+
+        /**
+         *
+         * @private
+         */
+        this._saveDatas = () => {
+            setTimeout(() => {
+                if (this._newMessages.length > 0) {
+                    saveNewMessages(this._newMessages)
+                        .then((response) => {
+                            if (response.status) {
+                                this._newMessages = [];
+                            }
+                            console.log(response.result.code + " " + response.result.message);
+                        });
+                } else {
+                    console.log("[Synchronisation] aucune donnée à synchroniser");
+                }
+                this._saveDatas();
+            }, (this._TIME_SAVE));
+        }
+
         this._loadMessages = async () => {
             return await getAllMessages();
         }
@@ -25,6 +60,8 @@ class Datas {
             .then((result) => {
                 this._messages = result;
             });
+
+        this._saveDatas();
     }
 
     /**
@@ -65,13 +102,7 @@ class Datas {
      */
     addMessage(message) {
         this._messages.push(message);
-    }
-
-    /**
-     *
-     */
-    resetMessages() {
-        this._messages = [];
+        this._newMessages.push(message);
     }
 }
 

@@ -16,3 +16,13 @@ exports.getUserByToken = (token) => {
         });
     });
 };
+
+exports.getAllUsers = () => {
+    return new Promise((resolve) => {
+        db.query("SELECT id, pseudo FROM user", (err, result) => {
+            if (err) resolve(null);
+
+            resolve(result);
+        });
+    });
+};
