@@ -22,6 +22,13 @@ export class Message {
          * @private
          */
         this._content = null;
+
+        /**
+         *
+         * @type {string|null}
+         * @private
+         */
+        this._tokenActions = null;
     }
 
     /**
@@ -74,6 +81,24 @@ export class Message {
      */
     setContent = (content) => {
         this._content = content;
+        return this;
+    }
+
+    /**
+     *
+     * @returns {string|null}
+     */
+    getTokenActions = () => {
+        return this._tokenActions;
+    }
+
+    /**
+     *
+     * @param {string} tokenActions
+     * @returns {Message}
+     */
+    setTokenActions = (tokenActions) => {
+        this._tokenActions = tokenActions;
         return this;
     }
 }

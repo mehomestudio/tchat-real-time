@@ -60,6 +60,39 @@ export class Chat {
             return text.replace(/[&<>"']/g, (m) => { return map[m]; });
         };
 
+        /**
+         *
+         * @param text
+         * @returns {*}
+         * @private
+         */
+        this._formatHtml = (text) => {
+            const map = {
+                '&amp;': '&',
+                '&lt;': '<',
+                '&gt;': '>',
+                '&quot;': '"',
+                '&#039;': "'",
+                "\n": " "
+        };
+
+            return text.replace(/(&amp;|&lt;|&gt;|&quot;|&#039;|\\n)/g, (m) => { return map[m]; });
+        };
+
+        /**
+         *
+         * @param {Date} date
+         * @private
+         */
+        this._formatDate = (date) => {
+            const hours = date.getHours() < 10 ? "0"+date.getHours() : date.getHours();
+            const minutes = date.getMinutes() < 10 ? "0"+date.getMinutes() : date.getMinutes();
+            return {
+                date: date.toLocaleDateString('fr'),
+                time: hours+":"+minutes
+            };
+        }
+
         this._updateCountUsersDOM = () => {
             this._DOMElement.columns.users
                 .querySelector('.chat-users-count')
@@ -90,27 +123,94 @@ export class Chat {
             return roomElement;
         }
 
+        this._createEditDOM = (token, cb) => {
+            const message = this._datas.messages.find((m) => m.getTokenActions() === token);
+            const result = {
+                status: true,
+                result: {
+                    element: null,
+                    error: {
+                        message: ""
+                    }
+                }
+            };
+
+            if (message) {
+                if (message.getAuthor() === this._datas.currentUser.getPseudo()) {
+                    const bodyInput = document.createElement('div');
+                    const inputEditMessage = document.createElement('textarea');
+                    const helpMessageValidaiton = document.createElement("p");
+                    const spanHelpMessageButtonValidation = document.createElement("span");
+                    const startTextHelpMessageValidation = document.createTextNode("Appuyez sur ");
+                    const endTextHelpMessageValidation = document.createTextNode(" pour enregistrer vos modifications.");
+
+                    spanHelpMessageButtonValidation.innerHTML = "Enter"
+                    helpMessageValidaiton.append(startTextHelpMessageValidation, spanHelpMessageButtonValidation, endTextHelpMessageValidation);
+
+                    inputEditMessage.dataset.token = token;
+                    inputEditMessage.value = this._formatHtml(message.getContent());
+
+                    bodyInput.className = "chat-messages-body-input";
+                    bodyInput.append(inputEditMessage, helpMessageValidaiton);
+
+                    result.result.element = bodyInput;
+                } else {
+                    result.status = false;
+                    result.result.error.message = "Vous ne pouvez pas modifier le message d'un autre utilisateur.";
+                }
+            } else {
+                result.status = false;
+                result.result.error.message = "Une erreur s'est produite lors de la modification du message.";
+            }
+
+            cb(result);
+        }
+
         this._createMessageDOM = (message) => {
             const messageElement = document.createElement('div');
             const header = document.createElement('div');
             const body = document.createElement('div');
+            const bodyText = document.createElement('div');
             const pseudo = document.createElement('span');
             const date = document.createElement('span');
             const heure = document.createElement('span');
 
-            pseudo.className = "chat-messages-pseudo";
+            let classCurrentUser = "";
+
+            if (message.getAuthor() === this._datas.currentUser.getPseudo()) {
+                const tools = document.createElement('div');
+                const iconEdit = document.createElement('i');
+                const iconTrash = document.createElement('i');
+
+                classCurrentUser = " current-user"
+
+                tools.className = "chat-messages-tools";
+                tools.dataset.token = message.getTokenActions();
+
+                iconEdit.className = "fa fa-pen";
+                iconTrash.className = "fa fa-trash-alt";
+
+                tools.append(iconEdit, iconTrash);
+                messageElement.append(tools);
+            }
+
+            pseudo.className = "chat-messages-pseudo" + classCurrentUser;
             pseudo.innerHTML = message.getAuthor();
             date.className = "chat-messages-date";
-            date.innerHTML = message.getCreatedAt().toLocaleDateString('fr');
+            date.innerHTML = this._formatDate(message.getCreatedAt()).date;
             heure.className = "chat-messages-heure";
-            heure.innerHTML = message.getCreatedAt().getHours() + ":" + message.getCreatedAt().getMinutes();
+            heure.innerHTML = this._formatDate(message.getCreatedAt()).time;
             header.className = "chat-messages-header";
             header.append(pseudo, date, heure);
 
             body.className = "chat-messages-body";
-            body.innerHTML = message.getContent();
+            bodyText.className = "chat-messages-body-text";
+            bodyText.innerText = this._formatHtml(message.getContent());
+
+            body.append(bodyText);
 
             messageElement.className = "chat-messages";
+            messageElement.dataset.token = message.getTokenActions();
             messageElement.append(header, body);
 
             return messageElement;
@@ -160,7 +260,7 @@ export class Chat {
                 messages: document.querySelector('.chat .chat-messages-list-header'),
                 users: document.querySelector('.chat .chat-users-list')
             },
-            inputSendMessage: document.querySelector('.chat .chat-messages-list-footer .chat-messages-send input[name="message"]')
+            inputSendMessage: document.querySelector('.chat .chat-messages-list-footer .chat-messages-send textarea[name="message"]')
         };
 
         /**
@@ -202,20 +302,31 @@ export class Chat {
 
     /**
      *
-     * @param value
-     * @return Message
+     * @param {String} value
+     * @param {String} actions
+     * @param {String|null}token
+     * @returns {Message}
      */
-    sendMessage(value)
+    sendMessage(value, actions, token = null)
     {
-        return new Message()
-            .setAuthor(this._datas.currentUser.getPseudo())
-            .setContent(this._escapeHtml(value))
-            .setCreatedAt(new Date());
+        if (actions === "add") {
+            return new Message()
+                .setAuthor(this._datas.currentUser.getPseudo())
+                .setContent(this._escapeHtml(value))
+                .setCreatedAt(new Date());
+        } else {
+            const message = this._datas.messages.find((m) => m.getTokenActions() === token);
+            if (message) {
+                message.setContent(this._escapeHtml(value));
+            }
+            return message;
+        }
     }
 
     /**
      *
      * @param {Message} msg
+     * @returns {HTMLDivElement}
      */
     addMessage(msg)
     {
@@ -223,10 +334,35 @@ export class Chat {
         this._DOMElement.columns.messages.append(elementDOM);
         this._datas.messages.push(msg);
         this._updateScroll(this._DOMElement.columns.messages);
+
+        return elementDOM;
+    }
+
+    /**
+     *
+     * @param {Message} msg
+     * @returns {boolean}
+     */
+    updateMessage(msg) {
+        const indexMessage = this._datas.messages.findIndex((m) => m.getTokenActions() === msg.getTokenActions());
+        const elementDOM = this._DOMElement.columns.messages
+            .querySelector('.chat-messages[data-token="'+msg.getTokenActions()+'"] .chat-messages-body-text');
+        if (indexMessage >= 0 && elementDOM) {
+            this._datas.messages[indexMessage].setContent(msg.getContent());
+            elementDOM.innerText = this._formatHtml(msg.getContent());
+
+            return true;
+        }
+
+        return false;
     }
 
     getMessages() {
         return this._datas.messages;
+    }
+
+    createEditMessageDOM(token, cb) {
+        return this._createEditDOM(token, cb);
     }
 
     addUser(userWs, cb)

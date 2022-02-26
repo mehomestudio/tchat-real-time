@@ -25,6 +25,9 @@ class Message
     #[ORM\ManyToOne(targetEntity: User::class, cascade: ['persist', 'remove'], inversedBy: 'messages')]
     private User $author;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private string $token;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -62,6 +65,18 @@ class Message
     public function setAuthor(?User $author): self
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getToken(): ?string
+    {
+        return $this->token;
+    }
+
+    public function setToken(string $token): self
+    {
+        $this->token = $token;
 
         return $this;
     }
