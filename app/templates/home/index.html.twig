@@ -7,8 +7,35 @@
 {% endblock %}
 
 {% block body %}
+    <div class="profil-password d-none">
+    </div>
     <div class="chat d-none">
-        <div class="chat-rooms scrollbar-light"></div>
+        <div class="chat-rooms scrollbar-light">
+            <div class="chat-rooms-list"></div>
+            <div class="chat-rooms-profil">
+                <div class="chat-rooms-profil-overlay d-none">
+                    <p>Profil</p>
+                    <ul>
+                        <li data-row="update-password">Modifier mot de passe</li>
+                        <li data-row="logout">Se déconnecter</li>
+                    </ul>
+                </div>
+                <div class="chat-rooms-profil-left">
+                    <div class="avatar">
+                        {{ app.user.pseudo|first|upper }}
+                        <div class="avatar-overlay d-none">
+                            <i class="fa fa-pen"></i>
+                        </div>
+                    </div>
+                    <div class="chat-rooms-profil-left-pseudo">
+                        {{ app.user.pseudo }}
+                    </div>
+                </div>
+                <div class="chat-rooms-profil-right">
+                    <i class="fa fa-ellipsis-v"></i>
+                </div>
+            </div>
+        </div>
         <div class="chat-messages-list">
             <div class="chat-messages-list-header scrollbar-dark">
                 {#<div class="chat-messages">

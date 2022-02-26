@@ -256,7 +256,7 @@ export class Chat {
         this._DOMElement = {
             app: document.querySelector('.chat'),
             columns: {
-                rooms: document.querySelector('.chat .chat-rooms'),
+                rooms: document.querySelector('.chat .chat-rooms .chat-rooms-list'),
                 messages: document.querySelector('.chat .chat-messages-list-header'),
                 users: document.querySelector('.chat .chat-users-list')
             },
@@ -400,6 +400,15 @@ export class Chat {
         this._DOMElement.columns.users.querySelector('.chat-users .chat-users-body[data-id='+ idWs +']').remove();
 
         cb(pseudo);
+    }
+
+    /**
+     *
+     * @returns {User}
+     */
+    getCurrentUser()
+    {
+        return this._datas.currentUser;
     }
 
 }

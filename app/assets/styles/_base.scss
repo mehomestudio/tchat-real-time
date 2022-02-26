@@ -24,6 +24,34 @@
   }
 }
 
+.avatar {
+  display: flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-large);
+  font-weight: var(--font-weight-bold);
+  width: 48px;
+  height: 48px;
+  background-color: #F24E1E;
+  border-radius: 50%;
+  box-shadow: 0 0 5px 2px var(--light);
+
+  &:hover &-overlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    z-index: 2;
+    font-size: var(--font-size-small);
+    background-color: rgba(68, 68, 68, 0.9);
+    cursor: pointer;
+  }
+}
+
 .scrollbar {
   &-light {
     &::-webkit-scrollbar {

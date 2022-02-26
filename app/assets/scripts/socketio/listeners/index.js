@@ -73,6 +73,74 @@ export function loadListenersGlobals(socket) {
                     showInputEditMessage(socket, chat, editElement);
                 });
             });
+
+            const btnProfilOverlayElement = document.querySelector(".chat-rooms .chat-rooms-profil .chat-rooms-profil-right i.fa-ellipsis-v");
+            const profilOverlayElement = document.querySelector(".chat-rooms .chat-rooms-profil .chat-rooms-profil-overlay");
+            const btnShowFormUpdatePassword = profilOverlayElement.querySelector("li[data-row='update-password']");
+            const btnLogOut = profilOverlayElement.querySelector("li[data-row='logout']");
+
+            btnLogOut.addEventListener("click", () => {
+                window.location = "/se-deconnecter";
+            });
+
+            btnProfilOverlayElement.addEventListener("click", () => {
+                profilOverlayElement.classList.toggle("d-none");
+            });
+
+            btnShowFormUpdatePassword.addEventListener("click", () => {
+                profilOverlayElement.classList.toggle("d-none");
+                const profilUpdatePassword = document.querySelector(".profil-password");
+                profilUpdatePassword.classList.toggle("d-none");
+                profilUpdatePassword.classList.toggle("d-flex");
+
+                const url = "/modifier-password/"+chat.getCurrentUser().getPseudo();
+
+                const funcGetForm = (url, method, datas = null) => {
+                    fetch(url, {
+                        method: method,
+                        body: datas
+                    })
+                        .then(async (response) => {
+                            const result = await response.json();
+                            if (response.ok && result["status"]) {
+                                if (result["code"] === 0) {
+                                    profilUpdatePassword.innerHTML = result["result"];
+                                    const btnCancel = profilUpdatePassword.querySelector("button.btn-warning");
+                                    const formUpdatePassword = profilUpdatePassword.querySelector("form[name='registration']");
+
+                                    const funcEventBtnCancel = () => {
+                                        profilUpdatePassword.innerHTML = "";
+                                        profilUpdatePassword.classList.toggle("d-flex");
+                                        profilUpdatePassword.classList.toggle("d-none");
+                                    };
+
+                                    const funcEventFormSubmit = (e) => {
+                                        e.preventDefault();
+                                        funcGetForm(url, "POST", new FormData(e.currentTarget));
+                                    };
+
+                                    btnCancel.addEventListener("click", funcEventBtnCancel);
+
+                                    formUpdatePassword.addEventListener("submit", funcEventFormSubmit);
+                                } else if (result["code"] === 1) {
+                                    profilUpdatePassword.innerHTML = "";
+                                    profilUpdatePassword.classList.toggle("d-flex");
+                                    profilUpdatePassword.classList.toggle("d-none");
+
+                                    Notify.success(result["message"]);
+                                }
+
+                            } else {
+                                Notify.error(result["message"]);
+                                profilUpdatePassword.classList.toggle("d-none");
+                            }
+
+                        });
+                };
+
+                funcGetForm(url, "GET");
+            });
+
             _load();
 
             loadingPage.updateMsg("Vous êtes connecté !<br/>Bienvenue "+currentUser.getPseudo());

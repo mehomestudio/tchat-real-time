@@ -278,8 +278,78 @@ class SecurityController extends AbstractController
 
         return $this->render('security/forgotten-password-reset.html.twig', [
             'form' => $form->createView(),
-            'email' => $user->getEmail()
+            'email' => $user->getEmail(),
+
         ]);
+    }
+
+    #[Route('/modifier-password/{pseudo}', name: 'app_password_update')]
+    #[Entity('user', options: ['mapping' => ['pseudo' => 'pseudo']])]
+    public function updatePassword(
+        ?User $user,
+        Request $request,
+        ManagerRegistry $manager,
+        MailerInterface $mailer,
+        UserPasswordHasherInterface $hasher
+    ): Response
+    {
+        $result = [
+            "status" => false,
+            "code" => -1,
+            "message" => "",
+            "result" => ""
+        ];
+
+        if (!$user || $user !== $this->getUser())
+        {
+            $result["message"] = "Une erreur s'est produite lors de la récupération du "
+            . "formulaire de modification du mot de passe";
+            return $this->json($result, 500);
+        }
+
+        $form = $this->createForm(RegistrationType::class, $user, [
+            'action' => $this->generateUrl('app_password_update', [
+                "pseudo" => $user->getPseudo()
+            ])
+        ]);
+        $form->remove("email");
+        $form->remove("pseudo");
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setPassword($hasher->hashPassword($user, $user->getPassword()));
+            $manager->getManager()->persist($user);
+            $manager->getManager()->flush();
+
+            $email = (new TemplatedEmail())
+                ->to($user->getEmail())
+                ->subject('Votre mot de passe a été modifié avec succès')
+                ->htmlTemplate('emails/templates/forgotten-password-success.html.twig')
+                ->context([
+                    'pseudo' => $user->getPseudo()
+                ]);
+
+            try {
+                $mailer->send($email);
+            } catch (TransportExceptionInterface $e) {
+            }
+
+            $result["status"] = true;
+            $result["code"] = 1;
+            $result["message"] = "Mot de passe modifié avec succès.";
+
+            return $this->json($result);
+
+
+        }
+
+        $result["status"] = true;
+        $result["code"] = 0;
+        $result["result"] = $this->renderView("home/partials/_update-password.html.twig", [
+            "form" => $form->createView()
+        ]);
+        return $this->json($result);
+
     }
 
     /**
