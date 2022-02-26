@@ -14,15 +14,16 @@
         {% endblock %}
     </head>
     <body class="d-flex flex-column">
-        <div class="d-flex flex-column">
-            {% for flash in app.flashes('notice') %}
-                <div class="d-flex justify-content-center p-30">
-                    {{ flash }}
-                </div>
-            {% endfor %}
-        </div>
         <div class="app-content flex-fill d-flex flex-row-nowrap justify-content-center">
-            <div class="content-main d-flex flex-row-nowrap flex-fill">
+            <div class="content-main d-flex justify-content-center flex-row-nowrap flex-fill">
+                <div class="notify">
+                    {% for notify in app.flashes('notify') %}
+                        <div class="notify-{{ notify.type }}" data-notify>
+                            <div class="close">X</div>
+                            {{ notify.message }}
+                        </div>
+                    {% endfor %}
+                </div>
                 {% block body %}{% endblock %}
             </div>
         </div>

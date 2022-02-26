@@ -80,7 +80,10 @@ class SecurityController extends AbstractController
             } catch (TransportExceptionInterface $e) {
             }
 
-            $this->addFlash('notice', 'Inscription réussie, vous avez reçu un email pour vérification.');
+            $this->addFlash('notify', [
+                "type" => "success",
+                "message" => "Inscription réussie, vous avez reçu un email pour vérification."
+            ]);
 
             return $this->redirectToRoute('app_login');
         }
@@ -99,7 +102,10 @@ class SecurityController extends AbstractController
         MailerInterface $mailer
     ): Response
     {
-        $notice = 'Le token est incorrect ou expiré, vous allez recevoir un email avec un nouveau lien.';
+        $notice = [
+            "type" => "error",
+            "message" => "Le token est incorrect ou expiré, vous allez recevoir un email avec un nouveau lien."
+        ];
 
         if ($user) {
             $htmlTemplate = "email-verified-success.html.twig";
@@ -113,7 +119,8 @@ class SecurityController extends AbstractController
                     ->setTokenEmail(null)
                     ->setIsEmailVerified(true);
 
-                $notice = "Votre email a été vérifié avec succès !";
+                $notice["type"] = "success";
+                $notice["message"] = "Votre email a été vérifié avec succès !";
             } else {
                 $token = TokenFunc::generateToken();
                 $user->setTokenEmail(sha1($token));
@@ -139,7 +146,7 @@ class SecurityController extends AbstractController
 
         }
 
-        $this->addFlash('notice', $notice);
+        $this->addFlash('notify', $notice);
 
         return $this->redirectToRoute('app_login');
     }
@@ -183,10 +190,10 @@ class SecurityController extends AbstractController
                 }
             }
 
-            $this->addFlash(
-                'notice',
-                'Demande de réinitialisation de mot de passe réalisée avec succès, un email vous a été envoyé.'
-            );
+            $this->addFlash('notify', [
+                "type" => "success",
+                "message" => "Demande de réinitialisation de mot de passe réalisée avec succès, un email vous a été envoyé."
+            ]);
 
             return $this->redirectToRoute('app_login');
 
@@ -230,10 +237,10 @@ class SecurityController extends AbstractController
                 }
             }
 
-            $this->addFlash(
-                'notice',
-                'Token invalide ou expiré, un email contenant une nouveau lien vous a été envoyé.'
-            );
+            $this->addFlash('notify', [
+                "type" => "error",
+                "message" => 'Token invalide ou expiré, un email contenant une nouveau lien vous a été envoyé.'
+            ]);
             return $this->redirectToRoute('app_login');
         }
 
@@ -261,7 +268,10 @@ class SecurityController extends AbstractController
             } catch (TransportExceptionInterface $e) {
             }
 
-            $this->addFlash('notice', 'Mot de passe modifié avec succès.');
+            $this->addFlash('notify', [
+                "type" => "success",
+                "message" => 'Mot de passe modifié avec succès.'
+            ]);
 
             return $this->redirectToRoute('app_login');
         }
@@ -273,7 +283,7 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/logout", name="app_logout")
+     * @Route("/se-deconnecter", name="app_logout")
      */
     public function logout(): void
     {
