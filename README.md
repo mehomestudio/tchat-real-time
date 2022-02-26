@@ -8,7 +8,7 @@ Suivez la documentation sur le lien suivant : https://docs.docker.com/desktop/
 Avant de lancer les containers, il est obligatoire de créer le volume de la base de données sur Docker.
 
 ```shell
-  $ >  Docker volume create tchat-real-time-db
+  $ >  docker volume create tchat-real-time-db
 ```
 
 Il vous faut configurer les variables d'environnements pour la connexion à la base de données et au serveur smtp.
