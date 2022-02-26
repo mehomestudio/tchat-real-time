@@ -21,13 +21,20 @@ class Message {
          * @private
          */
         this._content = null;
+
+        /**
+         *
+         * @type {string|null}
+         * @private
+         */
+        this._tokenActions = null;
     }
 
     /**
      *
      * @returns {string|null}
      */
-    getAuthor = () => {
+    getAuthor() {
         return this._author;
     }
 
@@ -35,7 +42,7 @@ class Message {
      * @param {string} author
      * @returns {Message}
      */
-    setAuthor = (author) => {
+    setAuthor(author) {
         this._author = author;
         return this;
     }
@@ -44,7 +51,7 @@ class Message {
      *
      * @returns {Date|null}
      */
-    getCreatedAt = () => {
+    getCreatedAt() {
         return this._createdAt;
     }
 
@@ -53,7 +60,7 @@ class Message {
      * @param {Date} createdAt
      * @returns {Message}
      */
-    setCreatedAt = (createdAt) => {
+    setCreatedAt(createdAt) {
         this._createdAt = createdAt;
         return this;
     }
@@ -62,7 +69,7 @@ class Message {
      *
      * @returns {string|null}
      */
-    getContent = () => {
+    getContent() {
         return this._content;
     }
 
@@ -71,8 +78,26 @@ class Message {
      * @param {string} content
      * @returns {Message}
      */
-    setContent = (content) => {
+    setContent(content) {
         this._content = content;
+        return this;
+    }
+
+    /**
+     *
+     * @returns {string|null}
+     */
+    getTokenActions() {
+        return this._tokenActions;
+    }
+
+    /**
+     *
+     * @param {string} tokenActions
+     * @returns {Message}
+     */
+    setTokenActions(tokenActions) {
+        this._tokenActions = tokenActions;
         return this;
     }
 }

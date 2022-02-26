@@ -1,7 +1,7 @@
 const {
     onLoad,
     onDisconnect,
-    onAddMessage
+    onActionMessage
 } = require("../../controllers/global");
 
 exports.global = (socket) => {
@@ -9,7 +9,7 @@ exports.global = (socket) => {
         await onLoad(token, socket);
     });
 
-    socket.on('add-message', onAddMessage);
+    socket.on('action-message', onActionMessage);
 
     socket.on("disconnect", () => {
         onDisconnect(socket);

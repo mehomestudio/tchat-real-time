@@ -1,5 +1,5 @@
 const {globalLoadCurrentUser} = require("../../listeners/global/load.listeners");
-const {addMessageListener} = require("../../listeners/global/message.listeners");
+const {actionMessageListener} = require("../../listeners/global/message.listeners");
 const { datas, io } = require("../../server/server");
 const StatusCode = require("../../consts/StatusCode");
 const MessagesCode = require("../../consts/MessagesCode");
@@ -38,10 +38,10 @@ exports.onLoad = async (token, socket) => {
     }
 };
 
-exports.onAddMessage = (msg) => {
-    const message = addMessageListener(msg);
-    datas.addMessage(message);
-    io.emit("add-message", message);
+exports.onActionMessage = (msg, action) => {
+    let message = actionMessageListener(msg, action);
+    datas.actionMessage(message, action);
+    io.emit("action-message", message, action);
 };
 
 exports.onDisconnect = (socket) => {
