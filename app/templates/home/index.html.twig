@@ -11,8 +11,11 @@
         <div class="chat-rooms scrollbar-light"></div>
         <div class="chat-messages-list">
             <div class="chat-messages-list-header scrollbar-dark">
-                {#{% for k in 0..100 %}
-                <div class="chat-messages">
+                {#<div class="chat-messages">
+                    <div class="chat-messages-tools">
+                        <i class="fa fa-pen"></i>
+                        <i class="fa fa-trash-alt"></i>
+                    </div>
                     <div class="chat-messages-header">
                         <span class="chat-messages-pseudo">User1</span>
                         <span class="chat-messages-date">20/02/2022</span>
@@ -23,12 +26,11 @@
                         earum, eius esse est ex fugit hic modi odit pariatur possimus, quis quo tempore veniam
                         vero voluptatibus.
                     </div>
-                </div>
-                {% endfor %}#}
+                </div>#}
             </div>
             <div class="chat-messages-list-footer">
                 <div class="chat-messages-send">
-                    <input class="form-control" type="text" name="message" placeholder="Envoyer un message dans #Général" />
+                    <textarea class="form-control" name="message" placeholder="Envoyer un message dans #Général"></textarea>
                 </div>
             </div>
         </div>

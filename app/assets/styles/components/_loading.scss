@@ -8,8 +8,8 @@
   background-color: var(--body-background);
   border-radius: var(--border-radius);
   z-index: 100;
-  height: 100vh;
-  width: 100vw;
+  height: 100%;
+  width: 100%;
 
   &-circleborder {
     border-radius: 50%;
