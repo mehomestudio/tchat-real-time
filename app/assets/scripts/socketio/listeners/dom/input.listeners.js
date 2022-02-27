@@ -35,7 +35,6 @@ exports.sendMessage = (socket, chat, event, actions, token = null) => {
 
 exports.showInputEditMessage = (socket, chat, input) => {
     const token = input.parentElement.dataset.token;
-    console.log(token);
 
     if (token) {
         chat.createEditMessageDOM(token, (response) => {

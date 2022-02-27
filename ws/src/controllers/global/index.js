@@ -44,6 +44,11 @@ exports.onActionMessage = (msg, action) => {
     io.emit("action-message", message, action);
 };
 
+exports.onUpdateAvatar = (currentUser) => {
+    let messages = datas.updateAvatar(currentUser);
+    io.emit("update-avatar", currentUser, messages);
+};
+
 exports.onDisconnect = (socket) => {
     socket.disconnect(true);
     io.sockets.emit("user-logout", socket.id);

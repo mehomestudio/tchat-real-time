@@ -22,10 +22,15 @@
                 </div>
                 <div class="chat-rooms-profil-left">
                     <div class="avatar">
-                        {{ app.user.pseudo|first|upper }}
+                        <input class="d-none" type="file" name="avatarFile" />
+                        <p>{{ app.user.pseudo|first|upper }}</p>
                         <div class="avatar-overlay d-none">
                             <i class="fa fa-pen"></i>
                         </div>
+                        {% if app.user.avatar %}
+                            <img src="{{ asset(app.user.avatar) }}" alt="{{ app.user.pseudo|first|upper }}" />
+                        {% else %}
+                        {% endif %}
                     </div>
                     <div class="chat-rooms-profil-left-pseudo">
                         {{ app.user.pseudo }}
@@ -43,15 +48,20 @@
                         <i class="fa fa-pen"></i>
                         <i class="fa fa-trash-alt"></i>
                     </div>
-                    <div class="chat-messages-header">
-                        <span class="chat-messages-pseudo">User1</span>
-                        <span class="chat-messages-date">20/02/2022</span>
-                        <span class="chat-messages-heure">17:01</span>
+                    <div class="avatar">
+                        U
                     </div>
-                    <div class="chat-messages-body">
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci amet at corporis dignissimos
-                        earum, eius esse est ex fugit hic modi odit pariatur possimus, quis quo tempore veniam
-                        vero voluptatibus.
+                    <div class="chat-messages-container">
+                        <div class="chat-messages-header">
+                            <span class="chat-messages-pseudo">User1</span>
+                            <span class="chat-messages-date">20/02/2022</span>
+                            <span class="chat-messages-heure">17:01</span>
+                        </div>
+                        <div class="chat-messages-body">
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci amet at corporis dignissimos
+                            earum, eius esse est ex fugit hic modi odit pariatur possimus, quis quo tempore veniam
+                            vero voluptatibus.
+                        </div>
                     </div>
                 </div>#}
             </div>
@@ -68,7 +78,8 @@
             <div class="chat-users">
  {#               {% for k in 1..31 %}
                 <div class="chat-users-body">
-                    User{{ k }}
+                    <div class="avatar">U</div>
+                    <div class="pseudo">User{{ k }}</div>
                 </div>
                 {% endfor %}#}
             </div>

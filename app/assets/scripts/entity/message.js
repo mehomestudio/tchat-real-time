@@ -5,11 +5,15 @@
 export class Message {
 
     constructor() {
-        /**
-         * @type {string|null}
+        /***
+         *
+         * @type {{avatar: String|null, pseudo: String|null}}
          * @private
          */
-        this._author = null;
+        this._author = {
+            "pseudo": null,
+            "avatar": null
+        };
 
         /**
          * @type {Date|null}
@@ -33,14 +37,15 @@ export class Message {
 
     /**
      *
-     * @returns {string|null}
+     * @returns {{avatar: (String|null), pseudo: (String|null)}}
      */
     getAuthor = () => {
         return this._author;
     }
 
     /**
-     * @param {string} author
+     *
+     * @param author
      * @returns {Message}
      */
     setAuthor = (author) => {

@@ -11,7 +11,7 @@ exports.actionMessageListener = (msg, action) => {
     }
 
     return new Message()
-        .setAuthor(msg['_author'])
+        .setAuthor(msg['_author'].pseudo, msg['_author'].avatar)
         .setContent(msg['_content'])
         .setCreatedAt(new Date(msg['_createdAt']))
         .setTokenActions(msg['_tokenActions']);

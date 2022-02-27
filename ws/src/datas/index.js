@@ -109,6 +109,31 @@ class Datas {
 
     /**
      *
+     * @param {{}} currentUser
+     * @return {[]}
+     */
+    updateAvatar(currentUser) {
+        const result = [];
+        const user = this._onlines.find((u) => u.getIdWs() === currentUser['_idWs']);
+        if (user) {
+            const indexUserOnline = this._onlines.findIndex((u) => u.getIdWs() === currentUser['_idWs']);
+            this._onlines[indexUserOnline].setAvatar(currentUser['_avatar']);
+
+            const messages = this._messages.filter((m) => m.getAuthor().pseudo === user.getPseudo());
+            messages.forEach((message) => {
+                const indexMessage = this._messages.findIndex((m) => m.getTokenActions() === message.getTokenActions());
+                if (indexMessage >= 0) {
+                    this._messages[indexMessage].setAuthor(user.getPseudo(), currentUser['_avatar']);
+                    result.push(message);
+                }
+            })
+        }
+
+        return result;
+    }
+
+    /**
+     *
      * @returns {[]|null}
      */
     getMessages() {

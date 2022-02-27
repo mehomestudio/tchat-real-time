@@ -21,7 +21,8 @@ export function loadListenersGlobals(socket) {
             const currentUser = (new User())
                 .setIdWs(l.result.currentUser._idWs)
                 .setPseudo(l.result.currentUser._pseudo)
-                .setToken(l.result.currentUser._token);
+                .setToken(l.result.currentUser._token)
+                .setAvatar(l.result.currentUser._avatar);
 
             loadingPage.updateMsg("Chargement des utilisateurs en ligne");
             const onlineUsers = [];
@@ -30,6 +31,7 @@ export function loadListenersGlobals(socket) {
                     .setIdWs(onlineUser._idWs)
                     .setPseudo(onlineUser._pseudo)
                     .setToken(onlineUser._token)
+                    .setAvatar(onlineUser._avatar)
                 );
             });
 
@@ -93,7 +95,7 @@ export function loadListenersGlobals(socket) {
                 profilUpdatePassword.classList.toggle("d-none");
                 profilUpdatePassword.classList.toggle("d-flex");
 
-                const url = "/modifier-password/"+chat.getCurrentUser().getPseudo();
+                const urlUpdatePassword = "/modifier-password/"+chat.getCurrentUser().getPseudo();
 
                 const funcGetForm = (url, method, datas = null) => {
                     fetch(url, {
@@ -138,7 +140,39 @@ export function loadListenersGlobals(socket) {
                         });
                 };
 
-                funcGetForm(url, "GET");
+                funcGetForm(urlUpdatePassword, "GET");
+            });
+
+            // Update avatar
+            const elementAvatar = document.querySelector('.chat-rooms-profil-left .avatar');
+            const inputUpdateAvatar = elementAvatar.querySelector('input[name="avatarFile"]');
+            const overlayUpdateAvatar = elementAvatar.querySelector('.avatar-overlay');
+
+            overlayUpdateAvatar.addEventListener('click', () => {
+                inputUpdateAvatar.click();
+            });
+
+
+            inputUpdateAvatar.addEventListener('change', (e) => {
+                if (e.currentTarget.value) {
+                    const form = document.createElement('form');
+                    form.appendChild(e.currentTarget);
+                    fetch("/modifier-avatar/"+chat.getCurrentUser().getPseudo(), {
+                        method: "POST",
+                        body: new FormData(form)
+                    })
+                        .then(async (response) => {
+                            const result = await response.json();
+                            if (response.ok) {
+                                chat.updateAvatarCurrentUser(result["pathAvatarUpdated"]);
+                                socket.emit("avatar-update", chat.getCurrentUser());
+                                Notify.success(result["message"]);
+                            } else {
+                                Notify.error(result["message"]);
+                            }
+                        })
+                }
+                e.currentTarget.value = "";
             });
 
             _load();
@@ -191,19 +225,30 @@ export function loadListenersGlobals(socket) {
             if (action === "add") {
                 const elementDOM = chat.addMessage(message);
 
-                const inputEdit = elementDOM.querySelector(".chat-messages-tools .fa-pen");
-                inputEdit.addEventListener("click", () => {
-                    showInputEditMessage(socket, chat, inputEdit);
-                });
+                if (message.getAuthor().pseudo === chat.getCurrentUser().getPseudo()) {
+                    const inputEdit = elementDOM.querySelector(".chat-messages-tools .fa-pen");
+                    const inputDelete = elementDOM.querySelector(".chat-messages-tools .fa-trash-alt");
+                    inputEdit.addEventListener("click", () => {
+                        showInputEditMessage(socket, chat, inputEdit);
+                    });
 
-                inputEdit.parentElement.parentElement.addEventListener("dblclick", () => {
-                    showInputEditMessage(socket, chat, inputEdit);
-                });
+                    inputEdit.parentElement.parentElement.addEventListener("dblclick", () => {
+                        showInputEditMessage(socket, chat, inputEdit);
+                    });
+
+                    inputDelete.addEventListener("click", () => {
+                        inputDeleteMessage(socket, chat, inputDelete);
+                    });
+                }
             } else if (action === "update" || action === "deleted") {
                 if (!chat.updateMessage(message)) {
                     Notify.error('Un message vient d\'être édité et n\'a pu être synchronisé. Veuillez raffraîchir la page actuelle.');
                 }
             }
+        });
+
+        socket.on("update-avatar", (user, messages) => {
+            chat.updateAvatarOtherUser(user, messages);
         });
 
         socket.on('disconnect', () => {

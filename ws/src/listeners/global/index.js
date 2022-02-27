@@ -1,7 +1,8 @@
 const {
     onLoad,
     onDisconnect,
-    onActionMessage
+    onActionMessage,
+    onUpdateAvatar
 } = require("../../controllers/global");
 
 exports.global = (socket) => {
@@ -10,6 +11,8 @@ exports.global = (socket) => {
     });
 
     socket.on('action-message', onActionMessage);
+
+    socket.on('avatar-update', onUpdateAvatar);
 
     socket.on("disconnect", () => {
         onDisconnect(socket);
