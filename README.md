@@ -19,13 +19,8 @@ DATABASE_URL="mysql://root:password@127.0.0.1:8001/db_dev?serverVersion=8.0.28"
 MAILER_DSN=smtp://localhost # Mailtrap, Mailcatcher, ...
 ```
 
-Si vous souhaitez un peu de contenu dans votre application, vous pouvez charger des fixtures :
-
-```shell
-  $ > make prepare-dev 
-```
-
-Dès que le volume de la base de données est créé, vous pouvez lancer les containers à partir du dossier '/app' :
+Dès que le volume de la base de données est créé et la configuration des variables d'environnement réalisée,
+vous pouvez lancer les containers à partir du dossier '/app' :
 ```shell
   $ >  make up
 ```
@@ -33,7 +28,10 @@ Dès que le volume de la base de données est créé, vous pouvez lancer les con
 Les serveurs sont lancés, vous pouvez vous rendre sur le site de l'application :
 https://localhost:8000
 
+Si vous souhaitez un peu de contenu dans votre application, vous pouvez charger des fixtures :
+
+```shell
+  $ > make prepare-dev # user1@gmail.fr à user30@gmail.fr
+```
+
 Enjoy !
-
-
-

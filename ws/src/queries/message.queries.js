@@ -5,7 +5,7 @@ const {generateToken} = require("../consts/Functions");
 
 exports.getAllMessages = () => {
     return new Promise((resolve) => {
-        db.query("SELECT user.pseudo, message.id, message.content, message.created_at, message.token "
+        db.query("SELECT user.pseudo, user.avatar, message.id, message.content, message.created_at, message.token "
                 +"FROM message "
                 +"LEFT JOIN user "
                 +"ON message.author_id = user.id "
@@ -19,7 +19,7 @@ exports.getAllMessages = () => {
                     if (generateToken.status) {
                         generateToken.result.elements.forEach((message) => {
                             messages.push(new Message()
-                                .setAuthor(message['pseudo'])
+                                .setAuthor(message['pseudo'], message['avatar'])
                                 .setContent(message['content'])
                                 .setCreatedAt(message['created_at'])
                                 .setTokenActions(message['token'])
@@ -46,12 +46,12 @@ exports.saveNewMessages = (newMessage) => {
         };
 
         newMessage.forEach((message, index) => {
-            const user = users.find((user) => user["pseudo"] === message.getAuthor());
+            const user = users.find((user) => user["pseudo"] === message.getAuthor().pseudo);
 
             if (!user) {
                 result.status = false;
                 result.result.code = "[Synchronisation échouée]"
-                result.result.message = "L'utilisateur " + message.getAuthor() + " n'a pas été trouvé dans "
+                result.result.message = "L'utilisateur " + message.getAuthor().pseudo + " n'a pas été trouvé dans "
                     + "la base de données. L'opération n'a pu synchroniser les données des nouveaux messages avec la base de données.";
                 resolve(result);
             }

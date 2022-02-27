@@ -3,36 +3,42 @@
  */
 export class User {
     /**
-     * @type {null}
+     * @type {String|null}
      * @private
      */
     _idWs = null;
 
     /**
-     * @type {null}
+     * @type {String|null}
      * @private
      */
     _pseudo = null;
 
     /**
-     * @type {null}
+     * @type {String|null}
      * @private
      */
     _token = null;
+
+    /**
+     * @type {String|null}
+     * @private
+     */
+    _avatar = null;
 
     constructor() {
     }
 
     /**
      *
-     * @returns {string|null}
+     * @returns {String|null}
      */
     getIdWs = () => {
         return this._idWs;
     }
 
     /**
-     * @param idWs
+     * @param {String} idWs
      * @returns {User}
      */
     setIdWs = (idWs) => {
@@ -42,7 +48,7 @@ export class User {
 
     /**
      *
-     * @returns {string|null}
+     * @returns {String|null}
      */
     getPseudo = () => {
         return this._pseudo;
@@ -50,7 +56,7 @@ export class User {
 
     /**
      *
-     * @param pseudo
+     * @param {String} pseudo
      * @returns {User}
      */
     setPseudo = (pseudo) => {
@@ -60,7 +66,7 @@ export class User {
 
     /**
      *
-     * @returns {string|null}
+     * @returns {String|null}
      */
     getToken = () => {
         return this._token;
@@ -68,11 +74,29 @@ export class User {
 
     /**
      *
-     * @param token
+     * @param {String} token
      * @returns {User}
      */
     setToken = (token) => {
         this._token = token;
+        return this;
+    }
+
+    /**
+     *
+     * @returns {String|null}
+     */
+    getAvatar = () => {
+        return this._avatar;
+    }
+
+    /**
+     *
+     * @param {String} avatar
+     * @returns {User}
+     */
+    setAvatar = (avatar) => {
+        this._avatar = avatar;
         return this;
     }
 }

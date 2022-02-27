@@ -41,6 +41,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', unique: true, nullable: true)]
     private ?string $token = null;
 
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $avatar = null;
+
     #[ORM\Column(type: 'boolean')]
     private bool $isEmailVerified = false;
 
@@ -144,6 +147,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setToken(?string $token): self
     {
         $this->token = $token;
+
+        return $this;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): self
+    {
+        $this->avatar = $avatar;
 
         return $this;
     }

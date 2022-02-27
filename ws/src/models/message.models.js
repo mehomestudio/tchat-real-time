@@ -5,10 +5,14 @@ class Message {
 
     constructor() {
         /**
-         * @type {string|null}
+         *
+         * @type {{avatar: null, pseudo: null}}
          * @private
          */
-        this._author = null;
+        this._author = {
+            "pseudo": null,
+            "avatar": null
+        };
 
         /**
          * @type {Date|null}
@@ -39,11 +43,14 @@ class Message {
     }
 
     /**
-     * @param {string} author
+     *
+     * @param {String} author
+     * @param {String} avatar
      * @returns {Message}
      */
-    setAuthor(author) {
-        this._author = author;
+    setAuthor(author, avatar) {
+        this._author.pseudo = author;
+        this._author.avatar = avatar;
         return this;
     }
 

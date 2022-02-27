@@ -107,10 +107,28 @@ export class Chat {
          */
         this._createUserDOM = (user) => {
             const userElement = document.createElement('div');
+            const avatar = document.createElement('div');
+            const avatarLetter = document.createElement('p');
+            const pseudo = document.createElement('div');
+
+            avatar.className = "avatar";
+            pseudo.className = "pseudo";
+
+            pseudo.innerText = user.getPseudo();
+            avatarLetter.innerText = user.getPseudo()[0];
+
+            avatar.append(avatarLetter);
+
+            if (user.getAvatar() !== null) {
+                const avatarImage = document.createElement('img');
+                avatarImage.src = user.getAvatar();
+                avatar.append(avatarImage);
+            }
 
             userElement.className = "chat-users-body";
-            userElement.innerHTML = user.getPseudo();
             userElement.dataset.id = user.getIdWs();
+
+            userElement.append(avatar, pseudo);
 
             return userElement;
         }
@@ -136,7 +154,7 @@ export class Chat {
             };
 
             if (message) {
-                if (message.getAuthor() === this._datas.currentUser.getPseudo()) {
+                if (message.getAuthor().pseudo === this._datas.currentUser.getPseudo()) {
                     const bodyInput = document.createElement('div');
                     const inputEditMessage = document.createElement('textarea');
                     const helpMessageValidaiton = document.createElement("p");
@@ -168,6 +186,9 @@ export class Chat {
 
         this._createMessageDOM = (message) => {
             const messageElement = document.createElement('div');
+            const avatar = document.createElement('div');
+            const avatarLetter = document.createElement('p');
+            const container = document.createElement('div');
             const header = document.createElement('div');
             const body = document.createElement('div');
             const bodyText = document.createElement('div');
@@ -177,7 +198,7 @@ export class Chat {
 
             let classCurrentUser = "";
 
-            if (message.getAuthor() === this._datas.currentUser.getPseudo()) {
+            if (message.getAuthor().pseudo === this._datas.currentUser.getPseudo()) {
                 const tools = document.createElement('div');
                 const iconEdit = document.createElement('i');
                 const iconTrash = document.createElement('i');
@@ -195,7 +216,7 @@ export class Chat {
             }
 
             pseudo.className = "chat-messages-pseudo" + classCurrentUser;
-            pseudo.innerHTML = message.getAuthor();
+            pseudo.innerHTML = message.getAuthor().pseudo;
             date.className = "chat-messages-date";
             date.innerHTML = this._formatDate(message.getCreatedAt()).date;
             heure.className = "chat-messages-heure";
@@ -209,9 +230,25 @@ export class Chat {
 
             body.append(bodyText);
 
+            container.className = "chat-messages-container";
+            avatar.className = "avatar";
+            avatar.style.marginTop = "15px";
+            avatar.style.marginRight = "5px";
+            avatarLetter.innerText = message.getAuthor().pseudo[0];
+
+            avatar.append(avatarLetter);
+
+            if (message.getAuthor().avatar !== null) {
+                const avatarImage = document.createElement('img');
+                avatarImage.src = message.getAuthor().avatar;
+                avatar.append(avatarImage);
+            }
+
+            container.append(header, body);
+
             messageElement.className = "chat-messages";
             messageElement.dataset.token = message.getTokenActions();
-            messageElement.append(header, body);
+            messageElement.append(avatar, container);
 
             return messageElement;
         }
@@ -256,7 +293,8 @@ export class Chat {
         this._DOMElement = {
             app: document.querySelector('.chat'),
             columns: {
-                rooms: document.querySelector('.chat .chat-rooms'),
+                avatar: document.querySelector('.chat-rooms-profil-left .avatar'),
+                rooms: document.querySelector('.chat .chat-rooms .chat-rooms-list'),
                 messages: document.querySelector('.chat .chat-messages-list-header'),
                 users: document.querySelector('.chat .chat-users-list')
             },
@@ -304,14 +342,17 @@ export class Chat {
      *
      * @param {String} value
      * @param {String} actions
-     * @param {String|null}token
-     * @returns {Message}
+     * @param {String} token
+     * @returns {Message|*}
      */
     sendMessage(value, actions, token = null)
     {
         if (actions === "add") {
             return new Message()
-                .setAuthor(this._datas.currentUser.getPseudo())
+                .setAuthor({
+                    "pseudo": this._datas.currentUser.getPseudo(),
+                    "avatar": this._datas.currentUser.getAvatar()
+                })
                 .setContent(this._escapeHtml(value))
                 .setCreatedAt(new Date());
         } else {
@@ -371,7 +412,8 @@ export class Chat {
         const user = (new User())
             .setIdWs(userWs._idWs)
             .setPseudo(userWs._pseudo)
-            .setToken(userWs._token);
+            .setToken(userWs._token)
+            .setAvatar(userWs._avatar);
 
         this._datas.users.push(user);
         this._datas.users.sort(this._sortByPseudo);
@@ -392,7 +434,6 @@ export class Chat {
     {
         const user = this._datas.users.find(user => user.getIdWs() === idWs);
         const pseudo = user.getPseudo();
-        console.log(pseudo);
         this._datas.users = this._datas.users.filter(user => user.getIdWs() !== idWs);
 
         // Mise à jour du DOM
@@ -400,6 +441,64 @@ export class Chat {
         this._DOMElement.columns.users.querySelector('.chat-users .chat-users-body[data-id='+ idWs +']').remove();
 
         cb(pseudo);
+    }
+
+    /**
+     *
+     * @returns {User}
+     */
+    getCurrentUser()
+    {
+        return this._datas.currentUser;
+    }
+
+    /**
+     *
+     * @param {string} path
+     */
+    updateAvatarCurrentUser(path)
+    {
+        const elementAvatar = this._DOMElement.columns.avatar;
+        let avatarImage = elementAvatar.querySelector('img');
+        if (!avatarImage) {
+            avatarImage = document.createElement('img');
+            elementAvatar.append(avatarImage);
+        }
+        avatarImage.src = path;
+        this._datas.currentUser.setAvatar(path);
+    }
+
+    /**
+     *
+     * @param {{}} user
+     * @param {{}} messages
+     */
+    updateAvatarOtherUser(user, messages) {
+        const elementUserOnlineDOM = this._DOMElement.columns.users
+            .querySelector(".chat-users .chat-users-body[data-id='"+user["_idWs"]+"'] .avatar");
+        if (elementUserOnlineDOM) {
+            let avatarUserOnline = elementUserOnlineDOM.querySelector('img');
+            if (!avatarUserOnline) {
+                avatarUserOnline = document.createElement('img');
+                elementUserOnlineDOM.append(avatarUserOnline);
+            }
+            avatarUserOnline.src = user['_avatar'];
+        }
+
+        messages.forEach((message) => {
+            const msgIndex = this._datas.messages.findIndex((m) => m.getTokenActions() === message['_tokenActions'] );
+            if (msgIndex >= 0) {
+                this._datas.messages[msgIndex].setAuthor(user['_pseudo'], user['_avatar']);
+                const avatarMessageDOM = this._DOMElement.columns.messages
+                    .querySelector('.chat-messages[data-token="'+message['_tokenActions']+'"] .avatar');
+                let imgAvatarMessage = avatarMessageDOM.querySelector('img');
+                if (!imgAvatarMessage) {
+                    imgAvatarMessage = document.createElement('img');
+                    avatarMessageDOM.append(imgAvatarMessage);
+                }
+                imgAvatarMessage.src = user['_avatar'];
+            }
+        });
     }
 
 }

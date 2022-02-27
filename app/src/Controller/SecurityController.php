@@ -7,10 +7,13 @@ use App\Form\ForgottenPasswordRequestType;
 use App\Form\RegistrationType;
 use App\Function\TokenFunc;
 use App\Repository\UserRepository;
+use App\Service\FileService;
 use Doctrine\Persistence\ManagerRegistry;
+use Psr\Container\ContainerExceptionInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Entity;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -278,8 +281,130 @@ class SecurityController extends AbstractController
 
         return $this->render('security/forgotten-password-reset.html.twig', [
             'form' => $form->createView(),
-            'email' => $user->getEmail()
+            'email' => $user->getEmail(),
+
         ]);
+    }
+
+    #[Route('/modifier-password/{pseudo}', name: 'app_password_update')]
+    #[Entity('user', options: ['mapping' => ['pseudo' => 'pseudo']])]
+    public function updatePassword(
+        ?User $user,
+        Request $request,
+        ManagerRegistry $manager,
+        MailerInterface $mailer,
+        UserPasswordHasherInterface $hasher
+    ): Response
+    {
+        $result = [
+            "status" => false,
+            "code" => -1,
+            "message" => "",
+            "result" => ""
+        ];
+
+        if (!$user || $user !== $this->getUser())
+        {
+            $result["message"] = "Une erreur s'est produite lors de la récupération du "
+            . "formulaire de modification du mot de passe";
+            return $this->json($result, 500);
+        }
+
+        $form = $this->createForm(RegistrationType::class, $user, [
+            'action' => $this->generateUrl('app_password_update', [
+                "pseudo" => $user->getPseudo()
+            ])
+        ]);
+        $form->remove("email");
+        $form->remove("pseudo");
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setPassword($hasher->hashPassword($user, $user->getPassword()));
+            $manager->getManager()->persist($user);
+            $manager->getManager()->flush();
+
+            $email = (new TemplatedEmail())
+                ->to($user->getEmail())
+                ->subject('Votre mot de passe a été modifié avec succès')
+                ->htmlTemplate('emails/templates/forgotten-password-success.html.twig')
+                ->context([
+                    'pseudo' => $user->getPseudo()
+                ]);
+
+            try {
+                $mailer->send($email);
+            } catch (TransportExceptionInterface $e) {
+            }
+
+            $result["status"] = true;
+            $result["code"] = 1;
+            $result["message"] = "Mot de passe modifié avec succès.";
+
+            return $this->json($result);
+
+
+        }
+
+        $result["status"] = true;
+        $result["code"] = 0;
+        $result["result"] = $this->renderView("home/partials/_update-password.html.twig", [
+            "form" => $form->createView()
+        ]);
+        return $this->json($result);
+
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     */
+    #[Route('/modifier-avatar/{pseudo}', name: 'app_avatar_update', methods: ['POST'])]
+    #[Entity('user', options: ['mapping' => ['pseudo' => 'pseudo']])]
+    public function updateAvatar(
+        ?User $user,
+        Request $request,
+        ManagerRegistry $manager,
+        FileService $fileService
+    ): Response
+    {
+        $result = [
+            "codeStatus" => 502,
+            "success" => false,
+            "message" => "Une erreur s'est produite, veuillez réessayer l'opération.",
+            "pathAvatarUpdated" => null
+        ];
+
+        if ($user && $user === $this->getUser()) {
+            /** @var File $newAvatar */
+            $newAvatar = $request->files->get('avatarFile');
+
+            if ($newAvatar)
+            {
+                $uploadFile = $fileService->uploadFile(
+                    $newAvatar,
+                    'avatar.folder',
+                    $user->getAvatar(),
+                    '/^(jpg|jpeg|png){1}$/'
+                );
+
+                if ($uploadFile['success'])
+                {
+                    $user->setAvatar($uploadFile['path']);
+
+                    $manager->getManager()->persist($user);
+                    $manager->getManager()->flush();
+
+                    $result['codeStatus'] = 200;
+                    $result['success'] = true;
+                    $result['message'] = "Votre avatar a été modifié avec succès.";
+                    $result['pathAvatarUpdated'] = $user->getAvatar();
+                } else {
+                    $result['message'] = $uploadFile['message'];
+                }
+            }
+        }
+
+        return $this->json($result, $result['codeStatus']);
     }
 
     /**

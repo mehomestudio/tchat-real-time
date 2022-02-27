@@ -17,6 +17,11 @@
     color: var(--light);
     font-weight: 600;
   }
+  &-warning {
+    background-color: var(--warning);
+    color: var(--light);
+    font-weight: 600;
+  }
   &-small {
     padding: 5px 15px;
   }
