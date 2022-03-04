@@ -2,7 +2,6 @@ version: '3.8'
 
 services:
   mysql:
-    network_mode: 'host'
     container_name: 'tchat_real_time_mysql'
     image: mysql:8.0
     command: --default-authentication-plugin=mysql_native_password --port=8001
@@ -13,9 +12,10 @@ services:
       - type: volume
         source: tchat-real-time-db
         target: /var/lib/mysql
+    ports:
+      - "8001:8001"
 
   php:
-    network_mode: 'host'
     container_name: 'tchat_real_time_php'
     build:
       context: .
@@ -23,7 +23,7 @@ services:
     volumes:
       - type: volume
         source: tls
-        target: /root/.symfony5/certs
+        target: /root/.symfony/certs
       - type: bind
         source: ./app
         target: /app
@@ -31,10 +31,10 @@ services:
         target: /app/vendor
     depends_on:
       - mysql
-      - node-encore
+    ports:
+      - "8000:8000"
 
   node-encore:
-    network_mode: 'host'
     container_name: 'tchat_real_time_node_encore'
     build:
       context: .
@@ -42,15 +42,18 @@ services:
     volumes:
       - type: volume
         source: tls
-        target: /root/.symfony5/certs
+        target: /root/.symfony/certs
       - type: volume
         target: /app/node_modules
       - type: bind
         source: ./app
         target: /app
+    depends_on:
+      - php
+    ports:
+      - "8002:8002"
 
   node-ws:
-    network_mode: 'host'
     container_name: 'tchat_real_time_node_ws'
     build:
       context: .
@@ -68,6 +71,13 @@ services:
       - mysql
       - php
       - node-encore
+    ports:
+      - "8003:8003"
+
+networks:
+  dev:
+    name: network_dev
+    driver: bridge
 
 volumes:
   tchat-real-time-db:
